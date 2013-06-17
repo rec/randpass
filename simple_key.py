@@ -10,6 +10,7 @@ CONSONANTS = 'bdfgklmnprstvz'
 LETTERS = VOWELS, CONSONANTS
 CAPITALIZE = True
 BAD_INITIALS = ['l', 'i']
+TERMINAL_PUNCTUATION = ['.', '...', '!', '?', '!!', '!?', '?!', '??']
 
 def is_bad(key):
   return badwords.is_bad(key) or (key[0] == BAD_INITIALS[CAPITALIZE])
