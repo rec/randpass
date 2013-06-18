@@ -3,39 +3,12 @@ from collections import namedtuple
 import random
 
 import badwords
-import Enum
+from Enum import Enum
 
-"""
-
-Parameters:
-
-words
-vowels
-consonants
-
-bad
-  initial
-  terminal
-
-pairs
-  initial
-  middle
-  terminal
-
-separator:
-  spaces
-  dot
-  none
-
-capitalize:
-  none
-  first
-  words
-
-numbers
-terminal punctuation
-
-"""
+PasswordGenerator = namedtuple(
+  'PasswordGenerator',
+  ['words', 'vowels', 'consonants', 'pairs', 'punctuation', 'numbers',
+   'word_start', 'separator', 'capitalize', 'bad'])
 
 Capitalize = Enum('NONE', 'FIRST', 'WORDS')
 LetterType = Enum('CONSONANT', 'VOWEL', 'BOTH')
@@ -43,19 +16,14 @@ LetterType = Enum('CONSONANT', 'VOWEL', 'BOTH')
 Pairs = namedtuple('Pairs', ['initial', 'middle', 'terminal'])
 Bad = namedtuple('Bad', ['initial', 'terminal'])
 
-PasswordGenerator = namedtuple(
-  'PasswordGenerator',
-  ['words', 'vowels', 'consonants', 'pairs', 'punctuation', 'numbers',
-   'word_start', 'separator', 'capitalize', 'bad'])
-
 NUMBERS = '0123456789'
 
-def make_word(generator, length, random=random):
+def make_word(generator, length, choice=random.choice):
   while True:
     parts = []
-    letter_type = random.word_start
+    letter_type = generator.word_start
     if letter_type is LetterType.BOTH:
-      letter_type = random.choice([LetterType.CONSONANT, LetterType.VOWEL])
+      letter_type = choice([LetterType.CONSONANT, LetterType.VOWEL])
 
     for i in xrange(length):
       if letter_type is LetterType.CONSONANT:
@@ -70,21 +38,21 @@ def make_word(generator, length, random=random):
       else:
         letters = generator.vowels
         letter_type = LetterType.CONSONANT
-      parts.append(random.choice(letters))
+      parts.append(choice(letters))
 
     word = ''.join(parts)
     if not badwords.is_bad(word):
       return word
 
-def make_password(generator, random=random):
-  words = [make_word(generator, w, random) for w in generator.words]
+def make_password(generator, choice=random.choice):
+  words = [make_word(generator, w, choice) for w in generator.words]
   if generator.capitalize is Capitalize.FIRST:
     if words:
       words[0] = words[0].capitalize()
   elif generator.capitalize is Capitalize.WORDS:
     words = [w.capitalize() for w in words]
   if generator.numbers:
-    word = ''.join(random.choose(NUMBERS) for i in xrange(generator.numbers))
+    word = ''.join(choice(NUMBERS) for i in xrange(generator.numbers))
     words.append(word)
   result = generator.separator.join(words)
-  return result + random.choose(generator.punctuation)
+  return result + choice(generator.punctuation)
