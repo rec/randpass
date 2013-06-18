@@ -51,7 +51,7 @@ def make_word(generator, length, choice=random.choice):
 
     for i in xrange(length):
       letter, letter_type = make_letter(generator, letter_type,
-                                        not i, i == (length - 1), choice)
+                                        not i, i == (length - 1), choice=choice)
       parts.append(letter)
 
     word = ''.join(parts)

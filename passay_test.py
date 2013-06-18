@@ -1,22 +1,28 @@
 """
 
->>> passay.make_letter(generator, passay.LetterType.VOWEL, False, False, choice)[0]
+>>> passay.make_letter(generator, passay.LetterType.VOWEL, False, False, choose_first)[0]
 'a'
 
->>> passay.make_letter(generator, passay.LetterType.CONSONANT, False, False, choice)[0]
+>>> passay.make_letter(generator, passay.LetterType.CONSONANT, False, False, choose_first)[0]
 'b'
 
 >>> passay.make_letter(generator, passay.LetterType.VOWEL, False, False, new_random())[0]
-'u'
+'a'
 
 >>> passay.make_letter(generator, passay.LetterType.CONSONANT, False, False, new_random())[0]
-'t'
+'f'
 
->>> passay.make_word(generator, 5, choice)
+>>> passay.make_word(generator, 5, choose_first)
 'babab'
 
 >>> passay.make_word(generator, 5, new_random())
-'oleni'
+'morom'
+
+>>> passay.make_password(generator, choose_first)
+'Babab babababa 000.'
+
+>>> passay.make_password(generator, new_random())
+'Morom idibuzek 721...'
 
 """
 
@@ -28,21 +34,28 @@ CONSONANTS = 'bdfgklmnprstvz'
 TERMINAL_PUNCTUATION = ['.', '...', '!', '?', '!!', '!?', '?!', '??']
 
 generator = passay.PasswordGenerator(
-  words=[6, 8],
+  words=[5, 8],
   vowels=VOWELS,
   consonants=CONSONANTS,
   punctuation=TERMINAL_PUNCTUATION,
   pairs=None,
-  numbers=0,
+  numbers=3,
   word_start=passay.LetterType.BOTH,
   separator=' ',
   capitalize=passay.Capitalize.FIRST,
   bad=None)
 
-def choice(x):
+def choose_first(x):
   for i in x:
     return i
 
+CHOICES = []
+
 def new_random():
-  random.seed(0)
-  return random.choice
+  random.seed(100)
+
+  def choice(x):
+    CHOICES.append(x)
+    return random.choice(x)
+
+  return choice
