@@ -18,6 +18,30 @@ Bad = namedtuple('Bad', ['initial', 'terminal'])
 
 NUMBERS = '0123456789'
 
+def make_letter(generator, letter_type, is_initial, is_terminal,
+                choice=random.choice):
+  if letter_type is LetterType.CONSONANT:
+    letters = generator.consonants
+    if generator.pairs:
+      if is_initial:
+        letters += generator.pairs.initial
+      elif is_terminal:
+        letters += generator.pairs.terminal
+      else:
+        letters += generator.pairs.middle
+    letter_type = LetterType.VOWEL
+  else:
+    letters = generator.vowels
+    letter_type = LetterType.CONSONANT
+
+  if generator.bad:
+    if is_initial:
+      letters = set(letters) - set(generator.bad.initial)
+    elif is_terminal:
+      letters = set(letters) - set(generator.bad.terminal)
+
+  return choice(letters), letter_type
+
 def make_word(generator, length, choice=random.choice):
   while True:
     parts = []
@@ -26,19 +50,9 @@ def make_word(generator, length, choice=random.choice):
       letter_type = choice([LetterType.CONSONANT, LetterType.VOWEL])
 
     for i in xrange(length):
-      if letter_type is LetterType.CONSONANT:
-        letters = generator.consonants
-        if not i:
-          letters += generator.pairs.initial
-        elif i == (length - 1):
-          letters += generator.pairs.terminal
-        else:
-          letters += generator.pairs.middle
-        letter_type = LetterType.VOWEL
-      else:
-        letters = generator.vowels
-        letter_type = LetterType.CONSONANT
-      parts.append(choice(letters))
+      letter, letter_type = make_letter(generator, letter_type,
+                                        not i, i == (length - 1), choice)
+      parts.append(letter)
 
     word = ''.join(parts)
     if not badwords.is_bad(word):
